@@ -108,4 +108,33 @@ class AuthController
         // Token válido
         $this->view('verify-email', ['token' => $token]);
     }
+
+    public function verifyEmailSubmit(){
+        $token = $_GET['token'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        if (empty($token) || empty($password)) {
+            throw new Exception('Token e password são obrigatórios');
+        }
+
+        $verDAO = new EmailVerificationDAO();
+
+        $userId = $verDAO->validateToken($token);
+
+        if(! $userId){
+            throw new Exception('Token inválido ou expirado');
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        $userDAO = new UserDAO();
+
+        $userDAO->setPasswordAndVerify($userId, $hash);
+
+        $verDAO->markUsed($token);
+
+        $_SESSION['flash_success'] = "Email verificado e password definida. Já podes fazer login.";
+    header("Location: /login");
+    exit;
+    }
 }

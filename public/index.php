@@ -60,6 +60,21 @@ if ($uri === '/' || $uri === '/index' || $uri === '/home') {
 
 else if ($uri === "/verify-email" && $method === "GET") {
   (new AuthController())->verifyEmailForm();
+
+} 
+
+
+else if ($uri === "/verify-email" && $method === "POST") {
+  var_dump("/verify-email POST");
+  try {
+    (new AuthController())->verifyEmailSubmit();
+  } catch (Exception $e) {
+    var_dump($e->getMessage());
+    $_SESSION['error'] = $e->getMessage();
+    // Redirecionar para a página de verificação de email
+    header('Location: /verify-email?token=' . urlencode($_GET['token'] ?? ''));
+    exit();
+  }
 }
 
 

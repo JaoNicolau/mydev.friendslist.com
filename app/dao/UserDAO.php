@@ -75,4 +75,18 @@ class UserDAO{
 
     return (int)$row['count'];
   }
+
+  public function setPasswordAndVerify($userId, $passwordHash) {
+    $sql = "
+      UPDATE users 
+      SET password = ?, 
+      is_verified = 1, 
+      verified_at = NOW() 
+      WHERE id = ?";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute([$passwordHash, $userId]);
+  }
+
+  
 }

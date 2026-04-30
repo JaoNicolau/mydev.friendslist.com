@@ -11,13 +11,13 @@ class UserController {
         $userDAO = new UserDAO();
         $users = $userDAO->getAllUsers();
 
-       $numUsers = $userDAO->countUsers();
+        $numUsers = $userDAO->countUsers();
 
-       $result = [
-        'numUsers' => $numUsers,
-        'users' => $users,
-        'nnumUserDoPorto' => 100000
-       ];
+        $result = [
+            'numUsers' => $numUsers,
+            'users' => $users,
+            'numUserDoPorto' => 100000
+        ];
 
         header('Content-Type: application/json');
         echo json_encode($result);
