@@ -2,27 +2,28 @@
 
 class WebController {
 
-    private function view($name){
-        require __DIR__ . '/../../public/views/' . $name . '.php';
-    }
-    public function index() {
-        $this->view('home');
-    }
+  private function view($name) {
+    require __DIR__ . '/../../public/views/' . $name . '.php';
+  }
 
-    public function login() {
-        $this->view('login');
-    }
 
-    public function about() {
-        $this->view('about');
-    }
 
-    public function signup() {
-        $this->view('signup');
-    }
+  public function index() {
+    $this->view('home');
+  }
 
-    // Errors Pages
-    public function badRequest() {
-        $this->view('errors/400');
-    }
+  public function login()
+  {
+    $this->view('login');
+  }
+
+  public function signup()
+  {
+    $this->view('signup');
+  }
+
+  // Errors Pages
+  public function badRequest() {
+    $this->view('errors/400');
+  }
 }
