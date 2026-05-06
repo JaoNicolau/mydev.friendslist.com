@@ -39,7 +39,7 @@
           <?php if (AuthMiddlewareWeb::isLogin()): ?>
 
             <li class="nav-item">
-              <a class="nav-link" href="/admin">
+              <a class="nav-link" href="/users/<?= $_SESSION['token']['id'] ?>">
                 <?= $_SESSION['token']['username'] ?>
                 <?= $_SESSION['token']['email'] ?>
 

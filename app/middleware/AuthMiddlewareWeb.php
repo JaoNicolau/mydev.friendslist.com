@@ -25,4 +25,23 @@ class AuthMiddlewareWeb {
       return false;
     }
   }
+
+  public static function canEdit($profileUserId) 
+  {
+    var_dump($profileUserId);
+    // $profileUserId é o profile do user que estou a ver
+    $userLogadoId = $_SESSION['token']['id'];
+    $userLogadoIsAdmin =  $_SESSION['token']['is_admin'];
+
+    if($userLogadoIsAdmin) {
+      return true;
+    }
+
+    if ($userLogadoId == $profileUserId) {
+      return true;
+    }
+
+    return false;
+
+  }
 }

@@ -11,6 +11,23 @@ class UserDAO {
     $this->conn = (new DataBase())->connect();
   }
 
+  private function mapRowToUser(array $row) {
+    $user = new User(
+      $row['id'],
+      $row['username'],
+      $row['email'],
+      $row['password'],
+      $row['is_admin'],
+      $row['created_at'],
+      $row['updated_at'],
+      $row['deleted_at'],
+      $row['is_verified'],
+      $row['verified_at']
+    );
+
+    return $user;
+  }
+
   public function findByEmail($email) {
     // Implementação para encontrar usuário pelo email
     $sql = "
@@ -33,27 +50,37 @@ class UserDAO {
     //var_dump($row);
 
     if($row) {
-      $user = new User(
-        $row['id'],
-        $row['username'],
-        $row['email'],
-        $row['password'],
-        $row['is_admin'],
-        $row['created_at'],
-        $row['updated_at'],
-        $row['deleted_at'],
-        $row['is_verified'],
-        $row['verified_at']
-      );
-
-
-      //var_dump($user);
-      return $user;
+      return $this->mapRowToUser($row);
     } else {
       return null;
     }
 
   }
+
+  public function findById($id)
+  {
+    $sql = '
+      SELECT * 
+      FROM users 
+      WHERE id = :id
+      LIMIT 1';
+
+    $stmt = $this->conn->prepare($sql);
+
+    $stmt->bindParam(':id', $id);
+
+    $stmt->execute();
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    //var_dump($row);
+    if ($row) {
+      return $this->mapRowToUser($row);
+    } else {
+      return null;
+    }
+  }
+
 
   public function createPending($username, $email) {
     $sql = "

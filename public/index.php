@@ -6,6 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 require "../app/controllers/WebController.php";
 require "../app/controllers/AuthController.php";
+require "../app/controllers/UserController.php";
 require "../app/services/Mailer.php";
 require "../app/middleware/AuthMiddlewareWeb.php";
 
@@ -96,6 +97,14 @@ elseif($uri === '/logout' && $method === 'GET') {
 
 
 elseif($uri === '/signup' && $method === 'GET') {
+  $isLogin = AuthMiddlewareWeb::isLogin();
+  // Se estiver logado não deico entrar no login
+  if ($isLogin) {
+    header("Location: /");
+    exit;
+  }
+
+
   (new WebController())->signup();
 }
 
@@ -142,6 +151,22 @@ elseif($uri === '/send-email/test' && $method === 'GET') {
   );
 
 }
+
+elseif($uri === '/users' && $method === 'GET') {
+  var_dump('users');
+}
+
+elseif(preg_match('#^/users/(\d+)$#', $uri, $m) && $method === 'GET'){
+  echo '<br/>';
+  var_dump($uri);
+  var_dump($m[1]);
+  var_dump('PRofile do user');
+
+  (new UserController())->user($m[1]);
+
+}
+
+
 
 //Errors Pages
 elseif($uri === '/bad-request') {
