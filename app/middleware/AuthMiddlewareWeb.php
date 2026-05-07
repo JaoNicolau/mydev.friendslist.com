@@ -28,7 +28,7 @@ class AuthMiddlewareWeb {
 
   public static function canEdit($profileUserId) 
   {
-    var_dump($profileUserId);
+    // var_dump($profileUserId);
     // $profileUserId é o profile do user que estou a ver
     $userLogadoId = $_SESSION['token']['id'];
     $userLogadoIsAdmin =  $_SESSION['token']['is_admin'];

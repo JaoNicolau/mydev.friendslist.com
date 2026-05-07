@@ -15,4 +15,8 @@ class UserController {
 
     $this->view('user/profile', ['user' => $user]);
   }
+
+  public function listAll() {
+    (new UserDAO())->getAll();
+  }
 }

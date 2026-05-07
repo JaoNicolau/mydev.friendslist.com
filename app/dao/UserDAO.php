@@ -119,4 +119,22 @@ class UserDAO {
     $stmt->execute([$passwordHash, $userId]);
 
   }
+
+  public function getAll() {
+    $sql = "SELECT * FROM users";
+
+    $stmt = $this->conn->prepare($sql);
+
+    $stmt->execute();
+
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $users = [];
+
+    foreach ($rows as $row) {
+      $users[] = $this->mapRowToUser($row);
+    }
+
+    var_dump($users[0]->getId());
+  }
 }

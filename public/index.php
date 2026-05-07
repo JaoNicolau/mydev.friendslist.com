@@ -12,7 +12,7 @@ require "../app/middleware/AuthMiddlewareWeb.php";
 
 
 
-var_dump($_SESSION['token']);
+//var_dump($_SESSION['token']);
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
@@ -154,6 +154,7 @@ elseif($uri === '/send-email/test' && $method === 'GET') {
 
 elseif($uri === '/users' && $method === 'GET') {
   var_dump('users');
+  (new UserController())->listAll();
 }
 
 elseif(preg_match('#^/users/(\d+)$#', $uri, $m) && $method === 'GET'){

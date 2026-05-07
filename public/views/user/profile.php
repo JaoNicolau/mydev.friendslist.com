@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <h4 class="mb-3">Profile</h4>
 
-                    <form method="POST" action="/signup">
+                    <form method="POST" action="/users/<?= $user->getId() ?>">
                         <input name="username" value="<?= $user->getUsername() ?>" class="form-control mb-2"
                             placeholder="Username" required <?php if (!AuthMiddlewareWeb::canEdit($user->getId())): ?>
                                 disabled <?php endif ?>>
