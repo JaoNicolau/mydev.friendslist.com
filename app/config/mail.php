@@ -2,9 +2,9 @@
 return [
   'host' => 'sandbox.smtp.mailtrap.io',
   'port' => 2525,          // ou 587 / 465 conforme o Mailtrap
-  'username' => '0b924e7258e215',
-  'password' => 'c6a9906a08cd3e',
+  'username' => '4adcf6c6ac3776',
+  'password' => '653582d77835c4',
   'encryption' => 'tls',   // 'tls' (STARTTLS) normalmente
-  'from_email' => 'no-reply@mydev.friendslist.com',
+  'from_email' => 'no-reply@mydevfriends.com',
   'from_name' => 'Meu Site',
 ];

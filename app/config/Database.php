@@ -1,18 +1,15 @@
 <?php
 
-class DataBase
-{
-  private $host = "localhost";
-  private $db_name = "mydevfriendslist";
-  private $username = "root";
-  private $password = "";
+class DataBase {
+    private $host = "localhost";
+    private $dbname = "mydevfriendslist";
+    private $username = "root";
+    private $password = "";
 
-  public function connect()
-  {
-    $conn = new PDO("mysql:host={$this->host};dbname={$this->db_name}", $this->username, $this->password);
+    public function connect() {
+            $conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->dbname, $this->username, $this->password);
 
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    return $conn;
-  }
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $conn;
+    }
 }

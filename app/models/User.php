@@ -1,210 +1,193 @@
 <?php
 
-class User {
+class User
+{
 
-  private int $id;
+    private int $id;
 
-  private string $username;
+    private string $username;
 
-  private string $email;
+    private string $email;
 
-  private string $password;
+    private string $password;
 
-  private bool $isAdmin;
+    private bool $isAdmin;
 
-  private ?string $createdAt;
+    private ?string $createdAt;
 
-  private ?string $updatedAt;
+    private ?string $updatedAt;
 
-  private ?string $deletedAt;
+    private ?string $deletedAt;
 
-  private bool $isVerified;
+    private bool $isVerified;
 
-  private ?string $verifiedAt;
- 
-  public function __construct(
+    private ?string $verifiedAt;
 
-    int $id = 0,
+    public function __construct(
 
-    string $username = '',
+        int $id = 0,
 
-    string $email = '',
+        string $username = '',
 
-    string $password = '',
+        string $email = '',
 
-    bool $isAdmin = false,
+        string $password = '',
 
-    ?string $createdAt = null,
+        bool $isAdmin = false,
 
-    ?string $updatedAt = null,
+        ?string $createdAt = null,
 
-    ?string $deletedAt = null,
-    bool $isVerified = false,
-    ?string $verifiedAt = null
-  ) {
+        ?string $updatedAt = null,
 
-    $this->id = $id;
+        ?string $deletedAt = null,
 
-    $this->username = $username;
+        bool $isVerified = false,
 
-    $this->email = $email;
+        ?string $verifiedAt = null
+    ) {
 
-    $this->password = $password;
+        $this->id = $id;
 
-    $this->isAdmin = $isAdmin;
+        $this->username = $username;
 
-    $this->createdAt = $createdAt;
+        $this->email = $email;
 
-    $this->updatedAt = $updatedAt;
+        $this->password = $password;
 
-    $this->deletedAt = $deletedAt;
+        $this->isAdmin = $isAdmin;
 
-    $this->isVerified = $isVerified;
+        $this->createdAt = $createdAt;
 
-    $this->verifiedAt = $verifiedAt;
+        $this->updatedAt = $updatedAt;
 
-  }
- 
-  public function getId(): int
+        $this->deletedAt = $deletedAt;
 
-  {
+        $this->isVerified = $isVerified;
 
-    return $this->id;
+        $this->verifiedAt = $verifiedAt;
 
-  }
+    }
 
-  public function setId(int $id): void
+    public function getId(): int
+    {
 
-  {
+        return $this->id;
 
-    $this->id = $id;
+    }
 
-  }
- 
-  public function getUsername(): string
+    public function setId(int $id): void
+    {
 
-  {
+        $this->id = $id;
 
-    return $this->username;
+    }
 
-  }
+    public function getUsername(): string
+    {
 
-  public function setUsername(string $username): void
+        return $this->username;
 
-  {
+    }
 
-    $this->username = $username;
+    public function setUsername(string $username): void
+    {
 
-  }
- 
-  public function getEmail(): string
+        $this->username = $username;
 
-  {
+    }
 
-    return $this->email;
+    public function getEmail(): string
+    {
 
-  }
+        return $this->email;
 
-  public function setEmail(string $email): void
+    }
 
-  {
+    public function setEmail(string $email): void
+    {
 
-    $this->email = $email;
+        $this->email = $email;
 
-  }
- 
-  public function getPassword(): string
+    }
 
-  {
+    public function getPassword(): string
+    {
 
-    return $this->password;
+        return $this->password;
 
-  }
+    }
 
-  public function setPassword(string $password): void
+    public function setPassword(string $password): void
+    {
 
-  {
+        $this->password = $password;
 
-    $this->password = $password;
+    }
 
-  }
- 
-  public function isAdmin(): bool
+    public function isAdmin(): bool
+    {
 
-  {
+        return $this->isAdmin;
 
-    return $this->isAdmin;
+    }
 
-  }
+    public function setIsAdmin(bool $isAdmin): void
+    {
 
-  public function setIsAdmin(bool $isAdmin): void
+        $this->isAdmin = $isAdmin;
 
-  {
+    }
 
-    $this->isAdmin = $isAdmin;
+    public function getCreatedAt(): ?string
+    {
 
-  }
- 
-  public function getCreatedAt(): ?string
+        return $this->createdAt;
 
-  {
+    }
 
-    return $this->createdAt;
+    public function setCreatedAt(?string $createdAt): void
+    {
 
-  }
+        $this->createdAt = $createdAt;
 
-  public function setCreatedAt(?string $createdAt): void
+    }
 
-  {
+    public function getUpdatedAt(): ?string
+    {
 
-    $this->createdAt = $createdAt;
+        return $this->updatedAt;
 
-  }
- 
-  public function getUpdatedAt(): ?string
+    }
 
-  {
+    public function setUpdatedAt(?string $updatedAt): void
+    {
 
-    return $this->updatedAt;
+        $this->updatedAt = $updatedAt;
 
-  }
+    }
 
-  public function setUpdatedAt(?string $updatedAt): void
+    public function getDeletedAt(): ?string
+    {
 
-  {
+        return $this->deletedAt;
 
-    $this->updatedAt = $updatedAt;
+    }
 
-  }
- 
-  public function getDeletedAt(): ?string
+    public function setDeletedAt(?string $deletedAt): void
+    {
 
-  {
+        $this->deletedAt = $deletedAt;
 
-    return $this->deletedAt;
+    }
 
-  }
+    public function is_verified(): bool
+    {
+        return $this->isVerified;
+    }
 
-  public function setDeletedAt(?string $deletedAt): void
-  {
-
-    $this->deletedAt = $deletedAt;
-
-  }
-
-  public function isVerified(): bool
-  {
-
-    return $this->isVerified;
-
-  }
-
-  public function getVerifiedAt(): ?string
-  {
-
-    return $this->verifiedAt;
-
-  }
+    public function getVerifiedAt(): ?string
+    {
+        return $this->verifiedAt;
+    }
 
 }
- 
