@@ -1,13 +1,14 @@
 <?php
-
-class Utils
-{
-    public static function jsonResponse($responseData, int $code = 200) :void {
+ 
+class Utils {
+   
+    public static function jsonresponse($dataResponse, $code = 200) {  
+        // 3. Configuração código da resposta
         http_response_code($code);
-        echo json_encode($responseData, JSON_UNESCAPED_UNICODE);
-        
+ 
+        echo json_encode($dataResponse, JSON_UNESCAPED_UNICODE);
         exit;
     }
 }
-
+ 
 ?>

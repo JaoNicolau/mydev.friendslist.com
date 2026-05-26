@@ -1,47 +1,52 @@
-<?php
+<?php 
+require_once __DIR__.'/../../vendor/autoload.php';
 
-require __DIR__ . '/../../vendor/autoload.php';
-
-require_once __DIR__ . '/../../app/Utils/utils.php';
-require_once __DIR__ . '/../../app/controllers/AuthController.php';
+require_once __DIR__.'/../../app/utils/Utils.php';
+require_once __DIR__.'/../../app/controllers/AuthController.php';
+require_once __DIR__.'/../../app/controllers/UserController.php';
+require_once __DIR__ . '/../../app/controllers/ProductController.php';
+require_once __DIR__.'/../../app/mddleware/AuthMiddlewareApi.php';
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-// 1 - Fazer o set do header
-header("Content-Type: application/json; charset=UTF-8");
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
 
-$uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-// var_dump($uri);
+header('Content-Type: application/json; charset=UTF-8');
 
-$uri = str_replace("/api", "", $uri);
-// var_dump($uri);
-$method = $_SERVER["REQUEST_METHOD"];
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+$uri = str_replace('/api', '', $uri);
+
+$method = $_SERVER['REQUEST_METHOD'];
 
 if (($uri === "/" || $uri === "/index") && $method === 'GET') {
-    Utils::jsonResponse([
-        "success" => false,
-        "message" => "id e nome são obrigatórios"
-    ], 200);
-    exit;
-} elseif ($uri === "/login" && $method === "POST") {
-    (new AuthController())->loginApi();
-} else {
-    $responseData = [
-        'sucess' => false,
-        'message' => 'Rota não encontrada',
-        'data' => []
-    ];
-
-    Utils::jsonResponse($responseData, 404);
+  Utils::jsonResponse([
+    "success" => false,
+    "message" => "id e nome são obrigatórios"
+  ], 200); 
+  exit;
 }
-// 2 - A forma da resposta
-// $responseData = [
-//     'sucess' => true,
-//     'message' => 'Bem-vindo ao sistema, meu caro utilizador maravilhoso',
-//     'data' => []
-// ];
 
-// Utils::jsonResponse($responseData, 200);
+else if ($uri === "/login" && $method === 'POST') {
+    (new AuthController())->loginApi();
+}
 
+else if ($uri === "/home" && $method === 'GET') {
+  $dataToken = AuthMiddlewareApi::check();
+
+  $products = (new ProductController())->getAllProductsByName($dataToken->id);
+}
+
+// Rota não encontrada
+else {
+
+  $dataResponse = [
+    'success' => false,
+    'message' => 'Rota não encontrada',
+    'data' => []
+  ];
+  Utils::jsonResponse($dataResponse, 404);
+}
 ?>

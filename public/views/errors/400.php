@@ -1,10 +1,12 @@
 <?php include __DIR__ . "/../../includes/header.php"; ?>
+
 <?php if (!empty($_SESSION['flash_success'])): ?>
     <div class="alert alert-success">
         <?= htmlspecialchars($_SESSION['flash_success']) ?>
     </div>
     <?php unset($_SESSION['flash_success']); ?>
 <?php endif; ?>
+
 <main class="min-vh-100 d-flex align-items-center">
     <div class="container">
         <div class="row justify-content-center">
@@ -34,7 +36,7 @@
                         <hr class="my-4" />
 
                         <small class="text-muted">
-                            Código do erro: <strong>400</strong>
+                            Código do erro: <strong>403</strong>
                         </small>
                     </div>
                 </div>

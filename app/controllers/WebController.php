@@ -1,12 +1,13 @@
 <?php
 
 class WebController {
+    
 
-    private function view($name){
-        require __DIR__ . '/../../public/views/' . $name . '.php';
+    private function view($viewName, $data = []) {
+        require_once __DIR__ . "/../../public/views/{$viewName}.php";
     }
 
-    public function index() {
+    public function index() {        
         $this->view('home');
     }
 
@@ -14,16 +15,17 @@ class WebController {
         $this->view('login');
     }
 
-    public function about() {
-        $this->view('about');
-    }
-
     public function signup() {
         $this->view('signup');
     }
 
-    //Errors pages
+    public function users() {
+        $this->view('users');
+    }
 
+    public function dashboard() {
+        $this->view('dashboard');
+    }
     public function badRequest() {
         $this->view('errors/400');
     }

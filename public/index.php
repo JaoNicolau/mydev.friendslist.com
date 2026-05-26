@@ -1,221 +1,165 @@
 <?php
-require __DIR__ . '/../vendor/autoload.php';
-
 session_start();
 
-//Imports
-require "../app/controllers/WebController.php";
-require "../app/controllers/AuthController.php";
-require "../app/controllers/UserController.php";
-require "../app/services/Mailler.php";
-require "../app/middleware/AuthMiddlewareWeb.php";
+// IMPORTS
+require_once __DIR__ . '/../vendor/autoload.php';
+
+require_once __DIR__ . "/../app/controllers/WebController.php";
+require_once __DIR__ . "/../app/controllers/AuthController.php";
+require_once __DIR__ . "/../app/controllers/UserController.php";
+require_once __DIR__ . "/../app/services/Mailer.php";
+require_once __DIR__ . "/../app/mddleware/AuthMiddlewareWeb.php";
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-//$uri = str_replace("mydevpiratas.com/public", "", $uri);
+$uri = str_replace("mydev.imoral.com/public", "", $uri);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-if($uri == '/' || $uri ==='/index'|| $uri === '/home') {
-    //var_dump("Estou na home");
+//var_dump($_SESSION);
+
+if($uri === '/' || $uri === '/index' || $uri === '/home') {
     (new WebController())->index();
 }
 
-elseif($uri === '/pagina_privada' && $method === 'GET') {
-
-    $_SESSION['toast'] = [
-        'type' => 'error',  
-        'message'=> 'Pagina protegida!!!'
-    ];
-
-        header('location: /index');
-
-    $isLogin = AuthMiddlewareWeb::islogin();
+elseif($uri === '/pagina-privada' && $method === 'GET') {
+    $isLogin = AuthMiddlewareWeb::isLogin();
 
     if(!$isLogin) {
         header("Location: /login");
-        exit();
+        exit;
+    } else {
+        die("Aceder à página privada");
     }
-    var_dump("Podes continuar");
-}
-
-elseif($uri === '/pagina_privada_admin' && $method === 'GET') {
-
-    $isLogin = AuthMiddlewareWeb::isAdmin();
-
-    if(!$isLogin) {
-        header("Location: /login");
-        exit();
-    }
-    var_dump("Podes continuar porque és admin");
-}
-
-
-elseif($uri === '/about' && $method === 'GET') {
-    (new WebController())->about();
 }
 
 elseif($uri === '/login' && $method === 'GET') {
-    //var_dump("Estou na página de login");
-
-    $isLogin = AuthMiddlewareWeb::isLogin();
-
-    if($isLogin) {
-        header("Location: /index");
-        exit();
+    if(AuthMiddlewareWeb::isLogin()) {
+        header("Location: /");
+        exit;
+    } else {
+        (new WebController())->login();
     }
-    (new WebController())->login();
-}
-
-elseif($uri === '/logout' && $method === 'GET') {
-    unset($_SESSION['token']);
-
-
-    $_SESSION['toast'] = [
-        'type' => 'success',
-        'message'=> 'Logout efetuado com sucesso'
-    ];
-    
-    header('Location: /login');
 }
 
 elseif($uri === '/login' && $method === 'POST') {
-
-    //Apanhar os dados do formulario
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    //var_dump($email);
-    //var_dump($password);
-
-    //var_dump($_POST);
-    
     (new AuthController())->loginWeb();
+}
 
+elseif($uri === '/logout' && $method === 'GET') {
+    if(AuthMiddlewareWeb::isLogin()) {
+        (new AuthController())->logoutWeb();
+        exit;
+    } else {
+        header("Location: /");
+        exit;
+    }
 }
 
 elseif($uri === '/signup' && $method === 'GET') {
     (new WebController())->signup();
-
 }
 
 elseif($uri === '/signup' && $method === 'POST') {
+
     try {
         (new AuthController())->signupWeb();
+
     } catch (Exception $e) {
+
+        var_dump($e);
         var_dump($e->getMessage());
-        $_SESSION['error'] = $e->getMessage();
+        $_SESSION['toast'] = [
+            'type' => 'error',
+            'message' => $e->getMessage()
+        ];
         header("Location: /signup");
         exit();
     }
+    
+
 }
 
 elseif($uri === '/verify-email' && $method === 'GET') {
-
+    // var_dump("Entrar na página de verificação de email");    
     (new AuthController())->verifyEmailForm();
 }
 
 elseif($uri === '/verify-email' && $method === 'POST') {
-
     try {
         (new AuthController())->verifyEmailSubmit();
-
-    }catch (Exception $e) {
+    } catch (Exception $e) {
+        var_dump($e);
         var_dump($e->getMessage());
-        $_SESSION['error'] = $e->getMessage();
-        header("Location: /verify-email?token=" . urlencode($_POST['token'] ?? ''));
+        $_SESSION['toast'] = [
+            'type' => 'error',
+            'message' => $e->getMessage()
+        ];
+        header("Location: /verify-email");
         exit();
-
     }
 }
 
 elseif($uri === '/users' && $method === 'GET') {
-
-    var_dump('users');
-
-    (new UserController())->listAll();
-}
-
-elseif(preg_match('#^/users/(\d+)$#', $uri, $m) && $method === 'GET'){
-
-    echo '<br/>';
-    var_dump($uri);
-    var_dump($m[1]);
-    var_dump('PRofile do user');
-
-    (new UserController())->user($m[1]);
-}
-
-elseif(preg_match('#^/users/(\d+)$#', $uri, $m) && $method === 'POST'){
-
-    echo '<br/>';
-    var_dump($uri);
-    var_dump($m[1]);
-    var_dump('PRofile do user');
-    try {
-
-        $_SESSION['toast'] =['type'=> 'success','message' => 'Atualização realizada com sucesso!!!'];
-
-        (new UserController())->userUpdate($m[1]);
-
-        header("Location: /users/$m[1]");
-        
-    }catch(Exception $e) {
-
-        $_SESSION['toast'] =['type'=> 'error', 'message'=> $e->getMessage()];
-
-        header("Location: /users/$m[1]");
-    }
-
-
-} elseif (preg_match('#^/users/(\d+)/delete$#', $uri, $m) && $method === 'GET') {
-    echo '<br/>';
-    var_dump($uri);
-    var_dump($m[1]);
-    var_dump('Delete do user');
-
-    try {
-    (new UserController())->userDelete($m[1]);
-
-    $_SESSION['toast'] = [
-        'type' => 'success',
-        'message' => 'Atualização realizada com muito sucesso!!!'
-    ];
-
-    header("Location: /users");
+    try{
+        (new UserController())->getUsers();
     } catch (Exception $e) {
-    $_SESSION['toast'] = [
-        'type' => 'error',
-        'message' => $e->getMessage()
-    ];
-
-    header("Location: /users/$m[1]");
+        $_SESSION['toast'] = [
+            'type' => 'error',
+            'message' => $e->getMessage()
+        ];
+        header("Location: /users");
+        exit();
     }
 }
 
-
-
-elseif ($uri === '/send-email/test' && $method === 'GET') {
-    var_dump('/send-email/test');
-
-    $html = file_get_contents(__DIR__ . "/views/emails/welcome.php");
-
-    var_dump($html);
-
-
-    (new Mailer())->send(
-        "37613@esjaloures.org",
-        "Teste Email",
-        $html
-    );
+elseif(preg_match('#^/users\/(\d+)$#', $uri, $m) && $method === 'GET') {
+    (new UserController())->profile($m[1]);
 }
 
-elseif($uri === '/bad-request') {
+elseif(preg_match('#^/users\/(\d+)/update$#', $uri, $m) && $method === 'POST') {
+    try{
+        (new UserController())->update($m[1]);
 
+        $_SESSION['toast'] = [
+            'type' => 'success',
+            'message' => 'Perfil atualizado com sucesso!'
+        ];
+        header("Location: /users/{$m[1]}");
+        exit();
+    } catch (Exception $e) {
+        var_dump($e);
+        var_dump($e->getMessage());
+        $_SESSION['toast'] = [
+            'type' => 'error',
+            'message' => $e->getMessage()
+        ];
+        header("Location: /users/{$m[1]}");
+        exit();
+    }
+}
+
+elseif($uri === '/dashboard' && $method === 'GET') {
+    if(!AuthMiddlewareWeb::isAdmin()) {
+        $_SESSION['toast'] = [
+            'type' => 'error',
+            'message' => 'Acesso negado. Apenas administradores podem acessar o dashboard.'
+        ];
+        header("Location: /home");
+        exit;
+    } else {
+        (new WebController())->dashboard();
+    }
+}
+
+// Rota das páginas de erro
+elseif($uri === '/bad-request' && $method === 'GET') {
     (new WebController())->badRequest();
 }
 
 else {
-    http_response_code(404);
-    echo "Página não encontrada";
+    echo "404 - Página não encontrada.";
 }

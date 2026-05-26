@@ -1,133 +1,109 @@
 <?php
 
 require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../config/DataBase.php';
+require_once __DIR__ . '/../config/Database.php';
 
-class UserDAO
-{
+class UserDAO {
+
     private $conn;
 
-    public function __construct()
-    {
-        // Conectar à base de dados
-        $this->conn = (new DataBase())->connect();
+    public function __construct() {
+        $this->conn = (new Database())->connect();
     }
 
-    private function mapRowToUser(array $row)
-    {
-        $user = new User(
-            $row['id'],
-            $row['username'],
-            $row['email'],
-            $row['password'],
-            $row['is_admin'],
-            $row['created_at'],
-            $row['updated_at'],
-            $row['deleted_at'],
-            $row['is_verified'],
-            $row['verified_at']
+    private function rowToUser(array $row): User {
+        return new User(
+            id:            (int)$row['id'],
+            username:      $row['username'],
+            email:         $row['email'],
+            image_id:       isset($row['image_id']) ? (int)$row['image_id'] : null,
+            telefone:      $row['telefone'] ?? null,
+            password:      $row['password'],
+            morada:        $row['morada'] ?? '',
+            dt_nascimento: $row['dt_nascimento'] ?? '',
+            dt_criacao:    $row['dt_criacao'] ?? '',
+            pronomes:      $row['pronomes'] ?? null,
+            is_admin:      (bool)$row['is_admin'],
+            ultimo_login:  $row['ultimo_login'] ?? '',
+            is_verified:   (bool)$row['is_verified'],
+            verified_at:   $row['verified_at'] ?? null,
+            created_at:    $row['created_at'],
+            updated_at:    $row['updated_at'],
+            deleted_at:    $row['deleted_at'] ?? null
         );
-
-        return $user;
     }
 
-    public function findByEmail($email)
-    {
-        // Implementação para encontrar usuário pelo email
+    public function findById($userId): User|false {
         $sql = "
-      SELECT *
-        FROM users
-        WHERE email = :email
-        AND is_verified = 1
-        AND verified_at IS NOT NULL
-        LIMIT 1
-    ";
-        // Preparar e executar a query usando PDO
-        $stmt = $this->conn->prepare($sql);
+            SELECT * 
+            FROM utilizadores 
+            WHERE id = :id
+            AND is_verified = 1
+            AND verified_at IS NOT NULL
+            LIMIT 1
+        ";
 
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $userId);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $this->rowToUser($row) : false;
+    }
+
+    public function findByEmail($email): User|false {
+        $sql = "
+            SELECT * 
+            FROM utilizadores 
+            WHERE email = :email
+            AND is_verified = 1
+            AND verified_at IS NOT NULL
+            LIMIT 1
+        ";
+
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':email', $email);
-
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        //var_dump($row);
-
-        if ($row) {
-            return $this->mapRowToUser($row);
-        } else {
-            return null;
-        }
-
+        return $row ? $this->rowToUser($row) : false;
     }
 
-    public function findById($id)
-    {
-        $sql = '
-      SELECT *
-        FROM users
-        WHERE id = :id
-        LIMIT 1';
-
-        $stmt = $this->conn->prepare($sql);
-
-        $stmt->bindParam(':id', $id);
-
-        $stmt->execute();
-
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        //var_dump($row);
-        if ($row) {
-            return $this->mapRowToUser($row);
-        } else {
-            return null;
-        }
-    }
-
-
-    public function createPending($username, $email)
-    {
+    public function updateUser($userId, $username, $email): int {
         $sql = "
-    INSERT INTO users
-    (
-        username,
-        email,
-        password,
-        is_admin,
-        is_verified,
-        verified_at,
-        created_at,
-        updated_at,
-        deleted_at)
-    VALUES (?, ?, '', 0, 0, NULL, NOW(), NOW(), NULL)
-    ";
+            UPDATE utilizadores 
+            SET username = ?, email = ?, updated_at = NOW()
+            WHERE id = ?
+        ";
 
         $stmt = $this->conn->prepare($sql);
-
-        $stmt->execute([$username, $email]);
-
-        return (int) $this->conn->lastInsertId();
+        $stmt->execute([$username, $email, $userId]);
+        return $stmt->rowCount();
     }
 
-    public function setPasswordAndVerify($userId, $passwordHash)
-    {
+    public function getUsersDao(): array {
         $sql = "
-    UPDATE users
-        SET password = ?,
-        is_verified = 1,
-        verified_at = NOW(),
-        updated_at = NOW()
-    WHERE id = ?
-    ";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$passwordHash, $userId]);
-
-    }
-
-    public function getAll(){
-        $sql = "SELECT * FROM users ";
+            SELECT 
+                utilizadores.id,
+                utilizadores.username,
+                utilizadores.email,
+                utilizadores.image_id,
+                utilizadores.telefone,
+                utilizadores.password,
+                utilizadores.morada,
+                utilizadores.dt_nascimento,
+                utilizadores.dt_criacao,
+                utilizadores.pronomes,
+                utilizadores.is_admin,
+                utilizadores.ultimo_login,
+                utilizadores.is_verified,
+                utilizadores.verified_at,
+                utilizadores.created_at,
+                utilizadores.updated_at,
+                utilizadores.deleted_at
+            FROM utilizadores 
+            WHERE is_verified = 1 AND verified_at IS NOT NULL
+        ";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
@@ -135,33 +111,83 @@ class UserDAO
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $users = [];
-        foreach($rows as $row){
-            $user = $this->mapRowToUser($row);
 
-            $users [] = $user;
+        foreach($rows as $row) {
+            $users[] = $this->rowToUser($row);
+
         }
+        
+        return $users;
     }
 
-    public function userUpdateDAO($userId, $username, $email, $isAdmin){
-        $sql = "UPDATE users SET username = ?, email = ?, is_admin = ? WHERE id= ? ";
+    public function createPending($username, $email): int {
+        $sql = "
+            INSERT INTO utilizadores 
+                (username, email, password, is_admin, image_id, morada, dt_nascimento, dt_criacao, pronomes, ultimo_login, is_verified, verified_at, created_at, updated_at, deleted_at)
+            VALUES 
+                (?, ?, '', 0, NULL, '', NULL, NOW(), NULL, NULL, 0, NULL, NOW(), NOW(), NULL)
+        ";
+    
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$username, $email]);
+        return (int)$this->conn->lastInsertId();
+    }
+
+    public function setPasswordAndVerify($userId, $passwordHash): void {
+        $sql = "
+            UPDATE utilizadores
+            SET password = ?, 
+                is_verified = 1, 
+                verified_at = NOW(),
+                updated_at = NOW()
+            WHERE id = ?
+        ";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$username, $email, $isAdmin, $userId]);
-
-        $resul = $stmt->rowCount();
-
-        return $resul;
+        $stmt->execute([$passwordHash, $userId]);
     }
 
-    public function userDeleteDAO($userId){
-        $sql = "DELETE FROM users WHERE id = ?";
+    public function arrayUsersDAO() {
+    $sql = "
+        SELECT
+            utilizadores.id,
+            utilizadores.username,
+            utilizadores.email,
+            utilizadores.image_id,
+            utilizadores.telefone,
+            utilizadores.password,
+            utilizadores.morada,
+            utilizadores.dt_nascimento,
+            utilizadores.dt_criacao,
+            utilizadores.pronomes,
+            utilizadores.is_admin,
+            utilizadores.ultimo_login,
+            utilizadores.is_verified,
+            utilizadores.verified_at,
+            utilizadores.created_at,
+            utilizadores.updated_at,
+            utilizadores.deleted_at 
+        FROM utilizadores;
+    ";
+ 
+    $stmt = $this->conn->prepare($sql);
+ 
+    $stmt->execute();
+ 
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ 
+    return $rows;
+  }
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$userId]);
+  public function countUsers(){
+    $sql = "
+        SELECT COUNT(*) as num_users 
+        FROM utilizadores;
+    ";
 
-        $resul = $stmt->rowCount();
-
-        return $resul;
-    }
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return (int)$stmt->fetchColumn();
+  }
 
 }

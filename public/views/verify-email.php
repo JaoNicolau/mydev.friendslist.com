@@ -1,5 +1,6 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+if (session_status() !== PHP_SESSION_ACTIVE)
+    session_start();
 /** @var string $token */
 ?>
 <!doctype html>
@@ -12,23 +13,20 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-light">
+<body class="bg-black d-flex flex-column min-vh-100">
     <div class="container py-5" style="max-width: 520px;">
-        <h1 class="h3 mb-3">Verificar email e definir password</h1>
-
-
-        <form method="post" action="/verify-email" class="card card-body shadow-sm">
+        <h1 class="text-white h3 mb-3">Verificar email e definir password</h1>
+        <form method="post" action="/verify-email" class="card card-body shadow-sm bg-black text-white" style="border: 1px solid white; box-shadow: 0 0 0 4px black, 0 0 0 6px white;">
             <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
 
-            <div class="mb-3">
-                <label class="form-label">Nova password</label>
-                <input class="form-control" type="password" name="password" required autocomplete="new-password">
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">Nova password</label>
+                    <input class="form-control" type="password" name="password" required autocomplete="new-password">
+                </div>
 
-            <button class="btn btn-primary w-100" type="submit">Confirmar</button>
-        </form>
-
-        <p class="text-muted small mt-3 mb-0">
+                <button class="btn btn-primary w-100" type="submit">Confirmar</button>
+            </form>
+        <p class="text-white small mt-3 mb-0">
             O link expira em 5 minutos. Se expirar, pede um novo link.
         </p>
     </div>
